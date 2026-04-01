@@ -1,0 +1,92 @@
+name: "Add a New Activity"
+description: "Request a new extracurricular activity to be added to the system."
+title: "Add Activity: [Activity Name]"
+labels: ["enhancement", "activity-management"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request a **new extracurricular activity** to be listed in the Mergington High School activity system.
+        Fill in all required fields so the request can be implemented without extra back-and-forth.
+
+  - type: input
+    id: activity_name
+    attributes:
+      label: Activity Name
+      description: The full name of the new activity as it should appear on the website.
+      placeholder: "e.g. Photography Club"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Activity Description
+      description: A short sentence or two describing what the activity is about.
+      placeholder: "e.g. Explore photography techniques and showcase your work in school exhibitions."
+    validations:
+      required: true
+
+  - type: input
+    id: schedule
+    attributes:
+      label: Schedule (human-readable)
+      description: When does the activity take place? Use the same format as existing activities.
+      placeholder: "e.g. Wednesdays, 3:30 PM - 5:00 PM"
+    validations:
+      required: true
+
+  - type: input
+    id: days
+    attributes:
+      label: Day(s) of the Week
+      description: List each day separated by a comma.
+      placeholder: "e.g. Wednesday"
+    validations:
+      required: true
+
+  - type: input
+    id: start_time
+    attributes:
+      label: Start Time (24-hour format)
+      description: Use HH:MM format.
+      placeholder: "e.g. 15:30"
+    validations:
+      required: true
+
+  - type: input
+    id: end_time
+    attributes:
+      label: End Time (24-hour format)
+      description: Use HH:MM format.
+      placeholder: "e.g. 17:00"
+    validations:
+      required: true
+
+  - type: input
+    id: max_participants
+    attributes:
+      label: Maximum Number of Participants
+      description: The maximum number of students allowed to sign up.
+      placeholder: "e.g. 20"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other information that might be helpful (e.g. room location, required materials, supervising teacher).
+      placeholder: "Optional – add anything else that should be noted."
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Implementation notes for the developer:**
+        - Insert the new activity directly into the running MongoDB `activities` collection using `insert_one` so the change is live immediately.
+        - The document `_id` must be the activity name (a string). Include `description`, `schedule` (human-readable string), `schedule_details` (`days` list, `start_time`, `end_time`), `max_participants`, and `participants` (empty list `[]`).
+        - Also add the same entry to the `initial_activities` dictionary in `src/backend/database.py` so the activity reappears if the database is ever wiped and re-initialized.
+        - The API endpoints are in `src/backend/routers/activities.py`; no router changes are needed for a simple data addition.

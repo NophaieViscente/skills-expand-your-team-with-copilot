@@ -1,0 +1,48 @@
+name: "Remove an Activity"
+description: "Request that an existing extracurricular activity be removed from the system."
+title: "Remove Activity: [Activity Name]"
+labels: ["activity-management"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request that an activity be **permanently removed** from the Mergington High School activity system.
+        This will also remove all student sign-ups for the activity.
+
+  - type: input
+    id: activity_name
+    attributes:
+      label: Activity Name
+      description: The exact name of the activity to remove (as it appears on the website).
+      placeholder: "e.g. Drama Club"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for Removal
+      description: Why should this activity be removed?
+      placeholder: "e.g. The supervising teacher has left and there is no replacement available."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      description: Please confirm you understand the impact of this change.
+      options:
+        - label: I understand that removing this activity will also remove all student sign-ups for it.
+          required: true
+        - label: I confirm this activity should be permanently removed from the website.
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Implementation notes for the developer:**
+        - Delete the activity from the running MongoDB `activities` collection using `delete_one({"_id": "<activity_name>"})` so the change is live immediately.
+        - Also remove the matching entry from the `initial_activities` dictionary in `src/backend/database.py` so the activity is not re-added if the database is ever wiped and re-initialized.
+        - No changes to the `teachers` collection are needed.

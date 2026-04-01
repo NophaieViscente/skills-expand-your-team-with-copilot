@@ -1,0 +1,58 @@
+name: "Manage Student Enrollment"
+description: "Request to manually add or remove a student from an extracurricular activity."
+title: "Enrollment Change: [Student Email] – [Activity Name]"
+labels: ["enrollment", "activity-management"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request a **manual enrollment change** for a student in the Mergington High School activity system.
+        This covers situations where a student cannot self-enroll or needs to be removed by a teacher.
+
+  - type: dropdown
+    id: action
+    attributes:
+      label: Action
+      description: Do you want to add or remove the student?
+      options:
+        - "Add student to activity"
+        - "Remove student from activity"
+    validations:
+      required: true
+
+  - type: input
+    id: student_email
+    attributes:
+      label: Student Email
+      description: The student's school email address (must end in @mergington.edu).
+      placeholder: "e.g. jane.doe@mergington.edu"
+    validations:
+      required: true
+
+  - type: input
+    id: activity_name
+    attributes:
+      label: Activity Name
+      description: The exact name of the activity (as it appears on the website).
+      placeholder: "e.g. Chess Club"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for Manual Change
+      description: Why does this change need to be made manually by a teacher?
+      placeholder: "e.g. The student registered late and the online sign-up is now closed."
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Implementation notes for the developer:**
+        - To **add** a student: use `update_one({"_id": "<activity>"}, {"$addToSet": {"participants": "<email>"}})` and verify the activity has not exceeded `max_participants`.
+        - To **remove** a student: use `update_one({"_id": "<activity>"}, {"$pull": {"participants": "<email>"}})`.
+        - The relevant API endpoints are in `src/backend/routers/activities.py` (`signup_for_activity` and `unregister_from_activity`).
+        - Student email addresses must end in `@mergington.edu`.
