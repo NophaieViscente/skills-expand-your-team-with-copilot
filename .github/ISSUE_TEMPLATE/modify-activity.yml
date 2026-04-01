@@ -1,0 +1,89 @@
+name: "Modify an Existing Activity"
+description: "Request changes to an existing extracurricular activity (schedule, capacity, or description)."
+title: "Modify Activity: [Activity Name]"
+labels: ["enhancement", "activity-management"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request **changes to an existing activity** in the Mergington High School activity system.
+        Please fill in only the fields you want to change – leave any field blank if it should stay the same.
+
+  - type: input
+    id: activity_name
+    attributes:
+      label: Activity Name
+      description: The exact name of the activity you want to modify (as it appears on the website).
+      placeholder: "e.g. Chess Club"
+    validations:
+      required: true
+
+  - type: textarea
+    id: new_description
+    attributes:
+      label: New Description (leave blank to keep current)
+      description: Updated description for the activity.
+      placeholder: "e.g. Learn advanced chess strategies and compete in regional tournaments."
+    validations:
+      required: false
+
+  - type: input
+    id: new_schedule
+    attributes:
+      label: New Schedule – Human-Readable (leave blank to keep current)
+      description: The new schedule as a readable sentence.
+      placeholder: "e.g. Mondays and Wednesdays, 3:15 PM - 4:45 PM"
+    validations:
+      required: false
+
+  - type: input
+    id: new_days
+    attributes:
+      label: New Day(s) of the Week (leave blank to keep current)
+      description: Comma-separated list of days.
+      placeholder: "e.g. Monday, Wednesday"
+    validations:
+      required: false
+
+  - type: input
+    id: new_start_time
+    attributes:
+      label: New Start Time – 24-hour format (leave blank to keep current)
+      placeholder: "e.g. 15:15"
+    validations:
+      required: false
+
+  - type: input
+    id: new_end_time
+    attributes:
+      label: New End Time – 24-hour format (leave blank to keep current)
+      placeholder: "e.g. 16:45"
+    validations:
+      required: false
+
+  - type: input
+    id: new_max_participants
+    attributes:
+      label: New Maximum Number of Participants (leave blank to keep current)
+      placeholder: "e.g. 15"
+    validations:
+      required: false
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for Change
+      description: Briefly explain why this change is needed.
+      placeholder: "e.g. The room was reassigned so meetings will now happen on a different day."
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Implementation notes for the developer:**
+        - Apply changes directly to the running MongoDB `activities` collection using `update_one({"_id": "<activity_name>"}, {"$set": {<fields>}})` so the change is live immediately.
+        - Remember to update both the human-readable `schedule` string **and** the `schedule_details` sub-document when the schedule changes.
+        - Also update the matching entry in the `initial_activities` dictionary in `src/backend/database.py` so the change persists if the database is ever wiped and re-initialized.
+        - Do not remove any existing participants when modifying an activity.
