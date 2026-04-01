@@ -1,0 +1,64 @@
+name: Feature Request
+description: Suggest a new feature or improvement to the website
+title: "Feature: [Short description of the idea]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to suggest a new feature or improvement. Please describe your idea clearly so it can be evaluated and implemented.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the situation or difficulty that led to this idea. Focus on the problem, not the solution.
+      placeholder: e.g., Teachers cannot easily see which students are signed up for multiple activities at the same time.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: Describe what you would like to see added or changed. Be as specific as possible.
+      placeholder: e.g., Add a page where teachers can view all students and the activities they are enrolled in.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List specific things that must be true for this feature to be considered complete.
+      placeholder: |
+        - [ ] Teachers can view a list of all students and their enrolled activities
+        - [ ] The list can be filtered by activity or by student name
+        - [ ] The feature is accessible from the main navigation
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you thought of other ways to solve this problem? List them here if so.
+      placeholder: e.g., Downloading a CSV report, or receiving a weekly email summary.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this to you?
+      options:
+        - Nice to have
+        - Important
+        - Urgent
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other information, examples, or references that might help explain the request.
+      placeholder: e.g., Similar to how Google Classroom shows student enrollment.

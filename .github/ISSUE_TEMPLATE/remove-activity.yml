@@ -1,0 +1,50 @@
+name: Remove Activity
+description: Request that an existing activity be removed from the website
+title: "Remove Activity: [Activity Name]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request that an activity be removed from the website. All sign-up records for this activity will also be removed. Please make sure you have notified the students who signed up before submitting this request.
+
+  - type: input
+    id: activity_name
+    attributes:
+      label: Activity Name
+      description: The exact name of the activity to remove (must match what is currently shown on the website).
+      placeholder: e.g., Drama Club
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for Removal
+      description: Briefly explain why this activity should be removed.
+      placeholder: e.g., The activity is no longer being offered due to lack of a supervisor.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      description: Please confirm the following before submitting.
+      options:
+        - label: I have notified the students who signed up for this activity.
+          required: true
+        - label: I understand that all sign-up records for this activity will be permanently removed.
+          required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will you know this request was completed correctly?
+      value: |
+        - [ ] The activity no longer appears on the website
+        - [ ] All student sign-ups for this activity have been removed
+        - [ ] All other activities remain unchanged
+    validations:
+      required: true

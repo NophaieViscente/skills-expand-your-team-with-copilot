@@ -1,0 +1,99 @@
+name: Add New Activity
+description: Request a new extracurricular activity to be added to the system
+title: "Add Activity: [Activity Name]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request a new extracurricular activity. Please fill in all fields so the request can be handled quickly and correctly.
+
+  - type: input
+    id: activity_name
+    attributes:
+      label: Activity Name
+      description: The full name of the new activity (e.g., "Photography Club")
+      placeholder: e.g., Photography Club
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Activity Description
+      description: A short description of what students will do in this activity (1–3 sentences).
+      placeholder: e.g., Students will learn the basics of photography, including composition and editing techniques.
+    validations:
+      required: true
+
+  - type: input
+    id: schedule
+    attributes:
+      label: Schedule (human-readable)
+      description: When does this activity take place? Write it in plain text.
+      placeholder: e.g., Wednesdays, 3:30 PM - 5:00 PM
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: days_of_week
+    attributes:
+      label: Day(s) of the Week
+      description: Select all days when this activity meets.
+      options:
+        - label: Monday
+        - label: Tuesday
+        - label: Wednesday
+        - label: Thursday
+        - label: Friday
+        - label: Saturday
+        - label: Sunday
+    validations:
+      required: true
+
+  - type: input
+    id: start_time
+    attributes:
+      label: Start Time (24-hour format)
+      description: What time does the activity start? Use 24-hour format (HH:MM).
+      placeholder: e.g., 15:30
+    validations:
+      required: true
+
+  - type: input
+    id: end_time
+    attributes:
+      label: End Time (24-hour format)
+      description: What time does the activity end? Use 24-hour format (HH:MM).
+      placeholder: e.g., 17:00
+    validations:
+      required: true
+
+  - type: input
+    id: max_participants
+    attributes:
+      label: Maximum Number of Participants
+      description: What is the maximum number of students who can sign up?
+      placeholder: e.g., 20
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will you know this request is done correctly? List what you expect to see.
+      value: |
+        - [ ] The new activity appears on the website with the correct name and description
+        - [ ] The schedule is shown correctly on the activity card
+        - [ ] Students can sign up for the activity
+        - [ ] The activity enforces the maximum number of participants
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other details, special requirements, or notes about this activity.
+      placeholder: e.g., This activity needs a teacher supervisor. Equipment is provided by the school.
