@@ -41,6 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentDay = "";
   let currentTimeRange = "";
 
+  // Shared activity from URL parameter (for deep-linking)
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedActivityName = urlParams.get("activity");
+  let sharedActivityHighlighted = false;
+
   // Authentication state
   let currentUser = null;
 
@@ -363,6 +368,89 @@ document.addEventListener("DOMContentLoaded", () => {
     return "academic";
   }
 
+  // Open share menu for an activity near the clicked button
+  function openShareMenu(activityName, details, buttonEl) {
+    // Create the dropdown once and reuse it
+    let shareDropdown = document.getElementById("share-dropdown");
+    if (!shareDropdown) {
+      shareDropdown = document.createElement("div");
+      shareDropdown.id = "share-dropdown";
+      shareDropdown.className = "share-dropdown";
+      document.body.appendChild(shareDropdown);
+
+      // Single event delegation listener — only added once
+      shareDropdown.addEventListener("click", (event) => {
+        const option = event.target.closest(".share-option");
+        if (!option) return;
+        const url = shareDropdown.dataset.shareUrl;
+        const text = shareDropdown.dataset.shareText;
+        const name = shareDropdown.dataset.activityName;
+        switch (option.dataset.action) {
+          case "copy":
+            navigator.clipboard.writeText(url).then(() => {
+              showMessage("Link copied to clipboard!", "success");
+            }).catch(() => {
+              showMessage("Copy this link: " + url, "info");
+            });
+            break;
+          case "email": {
+            const subject = encodeURIComponent(`Join this activity: ${name}`);
+            const body = encodeURIComponent(`${text}\n\nSign up here: ${url}`);
+            window.open(`mailto:?subject=${subject}&body=${body}`);
+            break;
+          }
+          case "whatsapp":
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + "\n" + url)}`, "_blank");
+            break;
+          case "twitter":
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text + " " + url)}`, "_blank");
+            break;
+        }
+        closeShareMenu();
+      });
+    }
+
+    // Store share data on the dropdown element for use by the delegation listener
+    const shareUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(activityName)}`;
+    shareDropdown.dataset.shareUrl = shareUrl;
+    shareDropdown.dataset.activityName = activityName;
+    shareDropdown.dataset.shareText = `Check out this activity: ${activityName} – ${details.description}`;
+
+    shareDropdown.innerHTML = `
+      <button class="share-option" data-action="copy">📋 Copy Link</button>
+      <button class="share-option" data-action="email">📧 Email</button>
+      <button class="share-option" data-action="whatsapp">💬 WhatsApp</button>
+      <button class="share-option" data-action="twitter">🐦 Twitter / X</button>
+    `;
+
+    // Position dropdown below the button
+    const rect = buttonEl.getBoundingClientRect();
+    shareDropdown.style.top = `${rect.bottom + window.scrollY + 5}px`;
+    shareDropdown.style.left = `${rect.left + window.scrollX}px`;
+    shareDropdown.classList.add("visible");
+  }
+
+  // Close the share dropdown
+  function closeShareMenu() {
+    const shareDropdown = document.getElementById("share-dropdown");
+    if (shareDropdown) {
+      shareDropdown.classList.remove("visible");
+    }
+  }
+
+  // Close share dropdown when clicking outside it
+  document.addEventListener("click", (event) => {
+    const shareDropdown = document.getElementById("share-dropdown");
+    if (
+      shareDropdown &&
+      shareDropdown.classList.contains("visible") &&
+      !shareDropdown.contains(event.target) &&
+      !event.target.classList.contains("share-button")
+    ) {
+      closeShareMenu();
+    }
+  });
+
   // Function to fetch activities from API with optional day and time filters
   async function fetchActivities() {
     // Show loading skeletons first
@@ -470,6 +558,20 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+
+    // Scroll to and highlight a shared activity (only once on initial load)
+    if (sharedActivityName && !sharedActivityHighlighted) {
+      const cards = activitiesList.querySelectorAll(".activity-card");
+      cards.forEach((card) => {
+        const heading = card.querySelector("h4");
+        if (heading && heading.textContent.trim() === sharedActivityName) {
+          sharedActivityHighlighted = true;
+          card.scrollIntoView({ behavior: "smooth", block: "center" });
+          card.classList.add("highlighted");
+          setTimeout(() => card.classList.remove("highlighted"), 3000);
+        }
+      });
+    }
   }
 
   // Function to render a single activity card
@@ -568,6 +670,9 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <button class="share-button" data-activity="${name}" title="Share this activity">
+          🔗 Share
+        </button>
       </div>
     `;
 
@@ -586,6 +691,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handler for share button
+    const shareButton = activityCard.querySelector(".share-button");
+    shareButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openShareMenu(name, details, shareButton);
+    });
 
     activitiesList.appendChild(activityCard);
   }
