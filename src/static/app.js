@@ -978,3 +978,128 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeFilters();
   fetchActivities();
 });
+
+// Animated Git-style branch lines background
+(function createAnimatedGitBackground() {
+  const canvas = document.createElement("canvas");
+  canvas.style.position = "fixed";
+  canvas.style.top = "0";
+  canvas.style.left = "0";
+  canvas.style.width = "100%";
+  canvas.style.height = "100%";
+  canvas.style.zIndex = "-1";
+  canvas.style.pointerEvents = "none";
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+
+  const LANE_COLORS = [
+    "rgba(50,205,50,0.30)",
+    "rgba(40,167,69,0.25)",
+    "rgba(86,224,103,0.22)",
+    "rgba(46,125,50,0.28)",
+    "rgba(127,233,127,0.20)",
+  ];
+
+  const SCROLL_SPEED = 24; // pixels per second
+  const COMMIT_STEP = 60;
+  const GRAPH_HEIGHT = 1800;
+
+  let w, h, lanes, scrollY = 0;
+  let lastTime = null;
+
+  function buildLanes() {
+    const laneCount = Math.max(3, Math.min(6, Math.floor(w / 180)));
+    lanes = [];
+    for (let i = 0; i < laneCount; i++) {
+      const x = (w / (laneCount + 1)) * (i + 1);
+      const color = LANE_COLORS[i % LANE_COLORS.length];
+      const dotColor = color.replace(/[\d.]+\)$/, "0.65)");
+      const commits = [];
+      for (let y = 0; y < GRAPH_HEIGHT; y += COMMIT_STEP) {
+        if (Math.random() > 0.35) {
+          commits.push(y + Math.random() * 20 - 10);
+        }
+      }
+      const branches = [];
+      for (let y = COMMIT_STEP; y < GRAPH_HEIGHT - COMMIT_STEP; y += COMMIT_STEP * 3) {
+        if (Math.random() > 0.6) {
+          const direction = Math.random() > 0.5 ? 1 : -1;
+          const targetIdx = Math.min(laneCount - 1, Math.max(0, i + direction));
+          if (targetIdx !== i) {
+            branches.push({ targetIdx, y });
+          }
+        }
+      }
+      lanes.push({ x, color, dotColor, commits, branches });
+    }
+  }
+
+  function draw(timestamp) {
+    if (lastTime === null) lastTime = timestamp;
+    const delta = Math.min(timestamp - lastTime, 100);
+    lastTime = timestamp;
+    scrollY = (scrollY + (SCROLL_SPEED * delta / 1000)) % GRAPH_HEIGHT;
+
+    ctx.clearRect(0, 0, w, h);
+
+    for (const lane of lanes) {
+      ctx.lineWidth = 1.5;
+
+      for (let pass = 0; pass < 2; pass++) {
+        const baseY = pass * GRAPH_HEIGHT - scrollY;
+
+        // Vertical line
+        ctx.strokeStyle = lane.color;
+        ctx.beginPath();
+        ctx.moveTo(lane.x, baseY);
+        ctx.lineTo(lane.x, baseY + GRAPH_HEIGHT);
+        ctx.stroke();
+
+        // Commit dots
+        for (const cy of lane.commits) {
+          const drawY = baseY + cy;
+          if (drawY < -20 || drawY > h + 20) continue;
+          ctx.fillStyle = lane.dotColor;
+          ctx.beginPath();
+          ctx.arc(lane.x, drawY, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = lane.dotColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(lane.x, drawY, 6.5, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.lineWidth = 1.5;
+        }
+
+        // Branch / merge connector lines
+        for (const branch of lane.branches) {
+          const drawY = baseY + branch.y;
+          if (drawY < -80 || drawY > h + 80) continue;
+          const targetLane = lanes[branch.targetIdx];
+          if (!targetLane) continue;
+          ctx.strokeStyle = lane.color;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(lane.x, drawY);
+          const cpY = drawY + COMMIT_STEP * 0.65;
+          ctx.bezierCurveTo(lane.x, cpY, targetLane.x, cpY, targetLane.x, drawY + COMMIT_STEP);
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    buildLanes();
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+  requestAnimationFrame(draw);
+})();
+
